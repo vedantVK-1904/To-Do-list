@@ -1,1 +1,202 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo List</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            background-image: url('Picture2.jpg');
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: black;
+            text-align: center;
+            font-size: 4em;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
+
+        #taskInput {
+            margin-bottom: 20px;
+            position: absolute;
+            top: 170px;
+            left: 47%;
+            transform: translate(-50%, 0);
+        }
+
+        #timeInput {
+            margin-bottom: 20px;
+            position: absolute;
+            top: 200px;
+            left: 47%;
+            transform: translate(-50%, 0);
+        }
+
+        #descriptionInput {
+            margin-bottom: 20px;
+            position: absolute;
+            top: 230px;
+            left: 47%;
+            transform: translate(-50%, 0);
+        }
+
+        button[onclick="addTask()"] {
+            position: absolute;
+            top: 260px;
+            left: 62%;
+        }
+
+        .todo-list {
+            list-style-type: none;
+            padding: 0;
+            width: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .todo {
+            padding: 10px;
+            margin-bottom: 6px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .completed {
+            background-color: #a6e1a6;
+        }
+
+        .incomplete {
+            background-color: #e1a6a6;
+        }
+
+        button {
+            margin-left: 1px;
+            border: none;
+            padding: 5px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        button[onclick="addTask()"] {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        button[onclick="addTask()"]:hover {
+            background-color: #0056b3;
+        }
+
+        button[onclick="markComplete(this)"] {
+            background-color: #808080;
+            color: white;
+        }
+
+        button[onclick="markComplete(this)"]:hover {
+            background-color: #606060;
+        }
+
+        button[onclick="removeTask(this)"] {
+            background-color: #000000;
+            color: white;
+        }
+
+        button[onclick="removeTask(this)"]:hover {
+            background-color: #404040;
+        }
+
+        .completed button[onclick="markComplete(this)"] {
+            background-color: #008000;
+            color: white;
+        }
+
+        .completed button[onclick="markComplete(this)"]:hover {
+            background-color: #006400;
+        }
+    </style>
+</head>
+<body>
+<h2>Todo List</h2>
+
+<input type="text" id="taskInput" placeholder="New task...">
+<input type="datetime-local" id="timeInput" placeholder="Time...">
+<textarea id="descriptionInput" placeholder="Description..."></textarea>
+<button onclick="addTask()">Add</button>
+
+<ul id="todoList" class="todo-list"></ul>
+
+<script>
+var todoList = document.getElementById('todoList');// declares unordered list where task is displayed
+var taskInput = document.getElementById('taskInput');// input field
+var timeInput = document.getElementById('timeInput');// time input field
+var descriptionInput = document.getElementById('descriptionInput');// description input field
+
+function addTask() {
+    var task = taskInput.value;
+    var time = new Date(timeInput.value);
+    var description = descriptionInput.value;
+    if (task && time && description) {
+        var listItem = document.createElement('li');
+        listItem.innerHTML = task + ' - ' + time.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + '<br>' + description + ' <span class="countdown"></span><br><button onclick="markComplete(this)">Mark Complete</button> <button onclick="removeTask(this)">Remove</button>';
+        listItem.className = 'todo incomplete';
+        todoList.appendChild(listItem);
+        taskInput.value = '';
+        timeInput.value = '';
+        descriptionInput.value = '';
+
+        var countdown = listItem.querySelector('.countdown');
+        var countdownInterval = setInterval(function() {
+            var now = new Date().getTime();
+            var distance = time.getTime() - now;
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                countdown.textContent = 'EXPIRED';
+            } else {
+                var hours = Math.floor(distance / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                countdown.textContent = hours + 'h ' + minutes + 'm ' + seconds + 's remaining';
+            }
+        }, 1000);
+
+        listItem.addEventListener('click', function() {
+            clearInterval(countdownInterval);
+        });
+    }
+}
+
+function removeTask(button) {
+    var listItem = button.parentNode;
+    todoList.removeChild(listItem);
+}
+
+function markComplete(button) {
+    var listItem = button.parentNode;
+    listItem.classList.remove('incomplete');
+    listItem.classList.add('completed');
+}
+</script>
+
+</body>
+</html>
